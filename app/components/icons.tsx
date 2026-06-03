@@ -52,6 +52,59 @@ export function ChartUpIcon(props: IconProps) {
   );
 }
 
+export function DashboardIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect width="7" height="9" x="3" y="3" rx="1" />
+      <rect width="7" height="5" x="14" y="3" rx="1" />
+      <rect width="7" height="9" x="14" y="12" rx="1" />
+      <rect width="7" height="5" x="3" y="16" rx="1" />
+    </SvgIcon>
+  );
+}
+
+export function UsersIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </SvgIcon>
+  );
+}
+
+export function SearchIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </SvgIcon>
+  );
+}
+
+export function TrashIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v5" />
+      <path d="M14 11v5" />
+    </SvgIcon>
+  );
+}
+
+export function WalletIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M20 7H5a3 3 0 0 1 0-6h12" />
+      <path d="M20 7v14H5a3 3 0 0 1-3-3V4" />
+      <path d="M16 14h4" />
+    </SvgIcon>
+  );
+}
+
 export function UtensilsIcon(props: IconProps) {
   return (
     <SvgIcon {...props}>
@@ -106,6 +159,32 @@ export function ArrowLeftIcon(props: IconProps) {
   );
 }
 
+export function ArrowRightIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </SvgIcon>
+  );
+}
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="m20 6-11 11-5-5" />
+    </SvgIcon>
+  );
+}
+
+export function CopyIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <rect width="14" height="14" x="8" y="8" rx="2" />
+      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </SvgIcon>
+  );
+}
+
 export function MailIcon(props: IconProps) {
   return (
     <SvgIcon {...props}>
@@ -137,6 +216,16 @@ export function UserIcon(props: IconProps) {
     <SvgIcon {...props}>
       <path d="M20 21a8 8 0 0 0-16 0" />
       <circle cx="12" cy="7" r="4" />
+    </SvgIcon>
+  );
+}
+
+export function LogOutIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
     </SvgIcon>
   );
 }

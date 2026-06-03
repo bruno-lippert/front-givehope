@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandLogo } from "./brand-logo";
 import { ButtonLink } from "./button-link";
+import { HeaderAuthActions } from "./header-auth-actions";
 
 const navItems = [
   { label: "Sobre Nós", href: "#sobre" },
@@ -29,9 +30,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <ButtonLink href="/login" variant="ghost" className="hidden md:flex">
-            Entrar
-          </ButtonLink>
+          <HeaderAuthActions />
           <ButtonLink href="/doacao" className="min-h-10 px-4 py-2">
             Doe<span className="hidden sm:inline">&nbsp;Agora</span>
           </ButtonLink>
