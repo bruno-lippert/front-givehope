@@ -3,6 +3,7 @@ export const DEFAULT_DONATION_VALUE = 50;
 export type StoredDonationUser = {
   id?: string;
   username?: string;
+  email?: string;
   role?: string;
 };
 

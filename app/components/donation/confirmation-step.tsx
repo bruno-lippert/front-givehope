@@ -106,3 +106,4 @@ function parseDonationSession(snapshot: string) {
     return {};
   }
 }
+

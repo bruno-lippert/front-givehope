@@ -2,16 +2,31 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
-import { CopyIcon } from "../icons";
+import { useMemo, useState, useSyncExternalStore } from "react";
+import { API_BASE_URL, getApiMessage, readApiBody } from "../../lib/api";
+import { CheckCircleIcon, CopyIcon } from "../icons";
 import { DonationCard } from "./donation-layout";
-import { formatCurrency, parseDonationValue } from "./donation-utils";
+import {
+  formatCurrency,
+  parseDonationValue,
+  type StoredDonationUser,
+} from "./donation-utils";
+
+type PaymentState =
+  | { status: "idle" }
+  | { status: "submitting" }
+  | { status: "success" }
+  | { status: "error"; message: string };
 
 export function PaymentStep() {
   const searchParams = useSearchParams();
   const value = parseDonationValue(searchParams.get("valor"));
   const [copied, setCopied] = useState(false);
+  const [paymentState, setPaymentState] = useState<PaymentState>({
+    status: "idle",
+  });
   const pixCode = useMemo(() => createFakePixCode(value), [value]);
+  const user = usePaymentUser();
 
   async function handleCopy() {
     try {
@@ -21,6 +36,57 @@ export function PaymentStep() {
       setCopied(false);
     }
   }
+
+  async function handleConfirmPayment() {
+    setPaymentState({ status: "submitting" });
+
+    const token = localStorage.getItem("givehope:token");
+
+    if (!token) {
+      setPaymentState({
+        status: "error",
+        message: "Sessao expirada. Faca login novamente.",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/doacao`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          usuarioId: user?.id,
+          nome: user?.username ?? "Doador GiveHope",
+          email: user?.email,
+          valor: value,
+        }),
+      });
+
+      const data = await readApiBody(response);
+
+      if (!response.ok) {
+        throw new Error(
+          getApiMessage(data, "Nao foi possivel registrar a doacao."),
+        );
+      }
+
+      setPaymentState({ status: "success" });
+    } catch (error) {
+      setPaymentState({
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Nao foi possivel conectar ao servidor.",
+      });
+    }
+  }
+
+  const isSubmitting = paymentState.status === "submitting";
+  const isSuccess = paymentState.status === "success";
 
   return (
     <DonationCard>
@@ -80,16 +146,77 @@ export function PaymentStep() {
         </p>
       </div>
 
-      <div className="mt-10 flex justify-center">
-        <Link
-          href="/"
-          className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-7 py-3 text-sm font-extrabold text-white shadow-xl shadow-primary/25 transition-colors hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-        >
-          Voltar para pagina inicial
-        </Link>
+      <div className="mt-8">
+        {paymentState.status === "error" ? (
+          <p
+            role="alert"
+            className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm font-bold text-red-700"
+          >
+            {paymentState.message}
+          </p>
+        ) : null}
+
+        {isSuccess ? (
+          <div
+            role="status"
+            className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4"
+          >
+            <CheckCircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+            <div>
+              <p className="text-sm font-extrabold text-emerald-800">
+                Doacao registrada com sucesso!
+              </p>
+              <p className="mt-1 text-sm font-semibold text-emerald-700">
+                Obrigado pela sua contribuicao de{" "}
+                <strong>{formatCurrency(value)}</strong>. Seu apoio faz a
+                diferenca.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void handleConfirmPayment()}
+            disabled={isSubmitting}
+            className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-4 text-base font-extrabold text-white shadow-xl shadow-primary/25 transition-colors hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSubmitting ? "Registrando doacao..." : "Confirmar pagamento"}
+          </button>
+        )}
       </div>
+
+      {isSuccess ? (
+        <div className="mt-10 flex justify-center">
+          <Link
+            href="/"
+            className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-7 py-3 text-sm font-extrabold text-white shadow-xl shadow-primary/25 transition-colors hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            Voltar para pagina inicial
+          </Link>
+        </div>
+      ) : null}
     </DonationCard>
   );
+}
+
+function usePaymentUser() {
+  const snapshot = useSyncExternalStore(
+    (onStoreChange) => {
+      window.addEventListener("storage", onStoreChange);
+      return () => window.removeEventListener("storage", onStoreChange);
+    },
+    () => localStorage.getItem("givehope:user") ?? "",
+    () => "",
+  );
+
+  return useMemo(() => {
+    if (!snapshot) return null;
+    try {
+      return JSON.parse(snapshot) as StoredDonationUser;
+    } catch {
+      return null;
+    }
+  }, [snapshot]);
 }
 
 function createFakePixCode(value: number) {
@@ -127,3 +254,4 @@ function FakeQrCode() {
     </div>
   );
 }
+

@@ -32,7 +32,7 @@ export function AmountStep() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push(createDonationUrl("/doacao/identificacao", donationValue));
+    router.push(createDonationUrl("/doacao/confirmacao", donationValue));
   }
 
   return (
